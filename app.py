@@ -3,16 +3,21 @@ from api import API
 app = API()
 
 
-@app.route("/home")
+@app.route("/home/")
 def home(request, response):
     response.text = "This is Home page"
 
 
-@app.route("/about")
+@app.route("/about/")
 def about(request, response):
     response.text = "This is About page"
 
 
-@app.route("/hello/{person_name}")
-def hello(request, response, person_name):
-    response.text = f"Hello, {person_name}"
+@app.route("/hello/{name}/")
+def hello(request, response, name):
+    response.text = f"Hello, {name}"
+
+
+@app.route("/products/{ID:d}/")
+def product_by_id(request, response, ID):
+    response.text = "This is product number: {}".format(ID)
