@@ -1,31 +1,18 @@
-from wsgiref.simple_server import make_server
+from api import API
+
+app = API()
 
 
-class Reverseware:
-    def __init__(self, app):
-        self.wrapped_app = app
-
-    def __call__(self, environ, start_response, *args, **kwargs):
-        wrapped_app_response = self.wrapped_app(environ, start_response)
-        return [data[::-1] for data in wrapped_app_response]
+@app.route("/home")
+def home(request, response):
+    response.text = "This is Home page"
 
 
-def application(environ, start_response):
-    response_body = [
-        '{}: {}'.format(key, value) for key, value in sorted(environ.items())
-    ]
-    response_body = '\n'.join(response_body)
-
-    status = '200 OK'
-
-    response_headers = [
-        ('Content-type', 'text/plain'),
-    ]
-
-    start_response(status, response_headers)
-
-    return [response_body.encode('utf-8')]
+@app.route("/about")
+def about(request, response):
+    response.text = "This is About page"
 
 
-server = make_server('localhost', 8000, app=Reverseware(application))
-server.serve_forever()
+@app.route("/hello/{person_name}")
+def hello(request, response, person_name):
+    response.text = f"Hello, {person_name}"
