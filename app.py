@@ -21,3 +21,12 @@ def hello(request, response, name):
 @app.route("/products/{ID:d}/")
 def product_by_id(request, response, ID):
     response.text = "This is product number: {}".format(ID)
+
+
+@app.route("/book")
+class BooksResource:
+    def get(self, req, resp):
+        resp.text = "Books Page"
+
+    def post(self, req, resp):
+        resp.text = "Endpoint to create a book"
