@@ -2,39 +2,39 @@ import pytest
 
 
 def test_basic_route_adding(api):
-    @api.route("/home")
+    @api.route('/home')
     def home(req, resp):
-        resp.text = "YOLO"
+        resp.text = 'YOLO'
 
 
 def test_route_overlap_throws_exception(api):
-    @api.route("/home")
+    @api.route('/home')
     def home(req, resp):
-        resp.text = "YOLO"
+        resp.text = 'Test'
 
     with pytest.raises(AssertionError):
-        @api.route("/home")
+        @api.route('/home')
         def home2(req, resp):
-            resp.text = "YOLO"
+            resp.text = 'Test'
 
 
-def test_bumbo_test_client_can_send_requests(api, client):
-    RESPONSE_TEXT = "THIS IS COOL"
+def test_client_can_send_requests(api, client):
+    response_text = "this is test message"
 
-    @api.route("/hey")
-    def cool(req, resp):
-        resp.text = RESPONSE_TEXT
+    @api.route('/test')
+    def test(req, resp):
+        resp.text = response_text
 
-    assert client.get("http://testserver/hey").text == RESPONSE_TEXT
+    assert client.get('http://testserver/test').text == response_text
 
 
-def test_parameterized_route(api, client):
+def test_parametrized_route(api, client):
     @api.route("/{name}")
-    def hello(req, resp, name):
-        resp.text = f"hey {name}"
+    def test(req, resp, name):
+        resp.text = f"test {name}"
 
-    assert client.get("http://testserver/matthew").text == "hey matthew"
-    assert client.get("http://testserver/ashley").text == "hey ashley"
+    assert client.get('http://testserver/test').text == 'test test'
+    assert client.get('http://testserver/test2').text == 'test test2'
 
 
 def test_default_404_response(client):
@@ -47,40 +47,30 @@ def test_default_404_response(client):
 def test_class_based_handler_get(api, client):
     response_text = "this is a get request"
 
-    @api.route("/book")
-    class BookResource:
+    @api.route('/book')
+    class BookResourse:
         def get(self, req, resp):
             resp.text = response_text
 
-    assert client.get("http://testserver/book").text == response_text
+    assert client.get('http://testserver/book').text == response_text
 
 
 def test_class_based_handler_post(api, client):
     response_text = "this is a post request"
 
-    @api.route("/book")
-    class BookResource:
+    @api.route('/book')
+    class BookResourse:
         def post(self, req, resp):
             resp.text = response_text
 
-    assert client.post("http://testserver/book").text == response_text
+    assert client.post('http://testserver/book').text == response_text
 
 
 def test_class_based_handler_not_allowed_method(api, client):
-    @api.route("/book")
-    class BookResource:
+    @api.route('/book')
+    class BookResourse:
         def post(self, req, resp):
-            resp.text = "yolo"
+            resp.text = "test"
 
     with pytest.raises(AttributeError):
-        client.get("http://testserver/book")
-
-
-def test_alternative_route(api, client):
-    response_text = "Alternative way to add a route"
-
-    def home(req, resp):
-        resp.text = response_text
-    api.add_route("/alternative", home)
-
-    assert client.get('http://testserver/alternative').text == response_text
+        client.get('http://testserver/book')
