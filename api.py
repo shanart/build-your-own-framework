@@ -15,6 +15,7 @@ class API:
         self.templates_env = Environment(
             loader=FileSystemLoader(os.path.abspath(templates_dir))
         )
+        self.exception_hanlder = None
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -48,15 +49,21 @@ class API:
 
         handler, kwargs = self.find_handler(request_path=request.path)
 
-        if handler is not None:
-            if inspect.isclass(handler):
-                handler = getattr(handler(), request.method.lower(), None)
-                if handler is None:
-                    raise AttributeError("Method not allowed", request.method)
+        try:
+            if handler is not None:
+                if inspect.isclass(handler):
+                    handler = getattr(handler(), request.method.lower(), None)
+                    if handler is None:
+                        raise AttributeError("Method not allowed", request.method)
 
-            handler(request, response, **kwargs)
-        else:
-            self.not_found(response)
+                handler(request, response, **kwargs)
+            else:
+                self.not_found(response)
+        except Exception as e:
+            if self.exception_hanlder is None:
+                raise e
+            else:
+                self.exception_hanlder(request, response, e)
 
         return response
 
@@ -69,3 +76,6 @@ class API:
         if context is None:
             context = {}
         return self.templates_env.get_template(template_name).render(**context)
+
+    def add_exception_handler(self, exception_hanlder):
+        self.exception_hanlder = exception_hanlder

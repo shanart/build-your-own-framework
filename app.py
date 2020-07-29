@@ -34,3 +34,8 @@ def template_handler(req, resp):
         "index.html",
         context={"name": "Template", "title": "Template body"}
     ).encode()
+
+def custom_exception_handler(request, response, exception_cls):
+    response.text = str(exception_cls)
+
+app.add_exception_handler(custom_exception_handler)
