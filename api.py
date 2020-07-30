@@ -8,6 +8,8 @@ from wsgiadapter import WSGIAdapter as RequestsWSGIAdapter
 from jinja2 import Environment, FileSystemLoader
 from whitenoise import WhiteNoise
 
+from middleware import Middleware
+
 
 class API:
 
@@ -16,11 +18,19 @@ class API:
         self.templates_env = Environment(
             loader=FileSystemLoader(os.path.abspath(templates_dir))
         )
-        self.exception_hanlder = None
+        self.exception_handler = None
         self.whitenoise = WhiteNoise(self.wsgi_app, root=static_dir)
+        self.middleware = Middleware(self)
 
     def __call__(self, environ, start_response):
-        return self.whitenoise(environ, start_response)
+        path_info = environ["PATH_INFO"]
+        if path_info.startswith('/static'):
+            environ["PATH_INFO"] = path_info[len("/static"):]
+            return self.whitenoise(environ, start_response)
+        return self.middleware(environ, start_response)
+
+    def add_middleware(self, middleware_cls):
+        self.middleware.add(middleware_cls)
 
     def wsgi_app(self, environ, start_response):
         request = Request(environ)
@@ -65,10 +75,10 @@ class API:
             else:
                 self.not_found(response)
         except Exception as e:
-            if self.exception_hanlder is None:
+            if self.exception_handler is None:
                 raise e
             else:
-                self.exception_hanlder(request, response, e)
+                self.exception_handler(request, response, e)
 
         return response
 
@@ -82,5 +92,5 @@ class API:
             context = {}
         return self.templates_env.get_template(template_name).render(**context)
 
-    def add_exception_handler(self, exception_hanlder):
-        self.exception_hanlder = exception_hanlder
+    def add_exception_handler(self, exception_handler):
+        self.exception_handler = exception_handler
