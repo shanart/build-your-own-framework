@@ -1,5 +1,5 @@
-from api import API
-from middleware import Middleware
+from ccframe.api import API
+from ccframe.middleware import Middleware
 app = API()
 
 
