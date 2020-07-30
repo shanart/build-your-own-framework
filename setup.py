@@ -8,7 +8,7 @@ DESCRIPTION = "ccframe - simple web framework. Cloned from Bumbo Python Web Fram
 EMAIL = "shanin.x@gmail.com"
 AUTHOR = "Alex Shanin"
 REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 # Which packages are required for this module to be executed?
 REQUIRED = [
